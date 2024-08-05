@@ -1,0 +1,55 @@
+import axios from "axios";
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import { BASE_URL } from "@env";
+
+// Async action for fetching classes
+export const createInstructorPayment = createAsyncThunk(
+  "advertisepayment/create",
+  async (paymentData, thunkAPI) => {
+    try {
+      console.log("paymentData: >>  ><><> ???", paymentData);
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: paymentData.token,
+        },
+      };
+
+      // Make an API call to create advertiseClassData
+      const response = await axios.post(
+        `${BASE_URL}/instructor-payment/create`, // Replace with your actual API endpoint
+        paymentData,
+        config
+      );
+
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+// Async action for fetching classes
+export const getInstructorPaymentHistory = createAsyncThunk(
+  "instructorpayment/history",
+  async (userData, thunkAPI) => {
+    try {
+      console.log("paymentData: ", userData.userToken);
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: userData.userToken,
+        },
+      };
+
+      // Make an API call to create advertiseClassData
+      const response = await axios.get(
+        `${BASE_URL}/instructor-payment/get/${userData._id}`, // Replace with your actual API endpoint
+        config
+      );
+
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);

@@ -1,0 +1,68 @@
+{
+  "expo": {
+    "plugins": [
+      "@react-native-firebase/app",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "custom photos permission",
+          "cameraPermission": "Allow $(PRODUCT_NAME) to open the camera"
+        }
+      ]
+    ],
+    "name": "Parking Mate",
+    "slug": "parking-mate",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/512-fithubs.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "config": {
+        "usesNonExemptEncryption": false
+      },
+      "bundleIdentifier": "com.parkingmate.parkingmate",
+      "buildNumber": "1",
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses camera to scan.",
+        "NSPhotoLibraryUsageDescription": "This app uses the photo library to save photos in app."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package":"com.parkingmate.parkingmate"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "4e604234-0969-411f-8622-f6fc027d8d51"
+      }
+    }
+  }
+}
