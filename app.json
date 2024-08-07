@@ -59,7 +59,7 @@
         "usesNonExemptEncryption": false
       },
       "bundleIdentifier": "com.parkingmate.parkingmate",
-      "buildNumber": "35",
+      "buildNumber": "36",
       "googleServicesFile": "./GoogleService-Info.plist",
       "infoPlist": {
         "NSCameraUsageDescription": "This app uses camera to scan.",
