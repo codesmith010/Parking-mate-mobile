@@ -1,43 +1,31 @@
-import React, { useEffect, useRef, useState } from "react";
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Button,
-  Alert,
-} from "react-native";
-import * as ImagePicker from "expo-image-picker";
-import { utils } from "@react-native-firebase/app";
 import storage from "@react-native-firebase/storage";
-import Colors from "../constants/Colors";
-import { useDispatch, useSelector } from "react-redux";
-import { all } from "axios";
+import * as ImagePicker from "expo-image-picker";
+import React, { useState } from "react";
 import {
-  fetchInstructorImages,
-  uploadInstructorImages,
-} from "../features/auth/authActions";
+  Alert,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import ImageView from "react-native-image-viewing";
+import Colors from "../constants/Colors";
+import {
+  setDrivingHostData,
+  setLoading,
+} from "../features/drivingHost/drivingHostSlice";
+import { dispatch, useSelector } from "../store/store";
 
-const MultipleImageUpload = () => {
-  const { user, isLoading, error, instructorImages } = useSelector(
-    (state) => state.user
-  );
+const MultipleImageUpload = ({ children }) => {
+  const { user, isLoading, error } = useSelector((state) => state.user);
   const [images, setImages] = useState([]);
   const [uploadProgress, setUploadProgress] = useState(null);
   const [uploadedImages, setUploadedImages] = useState(0);
   const [isImageUploaded, setIsImageUploaded] = useState(false);
-  // const [totalImages, setTotalImages] = useState(0);
+  const [visible, setIsVisible] = useState(false);
   const totalImages = images.length;
-
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(fetchInstructorImages({ userID: user._id }));
-  }, [isImageUploaded]);
-
-  console.log("InstructorImages: ", instructorImages);
 
   const handlePickImages = async () => {
     try {
@@ -55,27 +43,26 @@ const MultipleImageUpload = () => {
         setImages(selectedImages);
       }
     } catch (error) {
-      console.log("Error @handlePickImages: ", error);
       Alert.alert("Error, An error occurred while picking images");
     }
   };
 
   const uploadImages = async () => {
+    dispatch(setLoading(true));
     let allImagesSrc = [];
     let uploadedImagesCount = 0;
     for (const imageUri of images) {
-      console.log("Uploading image: ", imageUri);
+      // console.log("Uploading image: ", imageUri);
       const imageName = imageUri.substring(imageUri.lastIndexOf("/") + 1);
       const reference = storage().ref(imageName);
       const pathToFile = imageUri;
 
       try {
         const exists = await reference.getDownloadURL();
-        console.log("Image already exists: ", exists);
+
         Alert.alert("Error", "Image already exists");
         return;
       } catch (error) {
-        // console.log("Uploading image from path: ", pathToFile);
         const task = reference.putFile(pathToFile);
         task.on("state_changed", (taskSnapshot) => {
           const progress =
@@ -90,23 +77,18 @@ const MultipleImageUpload = () => {
           setUploadedImages((uploadedImages) => uploadedImages + 1);
           uploadedImagesCount = uploadedImagesCount + 1;
 
-          console.log("UploadedImages: ", uploadedImagesCount);
-          console.log("TotalImages: ", totalImages);
-          console.log("AllImagesSrc: ", allImagesSrc);
-
           if (uploadedImagesCount === totalImages) {
             // All images are uploaded
 
-            const dispatchUploadingInstructorImage = await dispatch(
-              uploadInstructorImages({
-                userID: user._id,
-                imageSrc: allImagesSrc,
+            const dispatchSavingMultipleImages = await dispatch(
+              setDrivingHostData({
+                fieldName: "ParkingPhotos",
+                value: allImagesSrc,
               })
             );
 
-            if (dispatchUploadingInstructorImage) {
+            if (dispatchSavingMultipleImages) {
               setIsImageUploaded(true);
-              Alert.alert(dispatchUploadingInstructorImage.payload.message);
               return;
             }
 
@@ -114,12 +96,35 @@ const MultipleImageUpload = () => {
             return;
           }
         } catch (uploadError) {
-          console.error("Error uploading image: ", uploadError);
+          // console.error("Error uploading image: ", uploadError);
           Alert.alert("Error", "An error occurred while uploading images");
         }
       }
     }
   };
+
+  // handle Image viewer
+  const handleImageViewer = () => {
+    setIsVisible(!visible);
+  };
+
+  const convertToImagesArray = (data) => {
+    if (!Array.isArray(data)) {
+      return;
+    }
+    if (data.length === 0) {
+      return;
+    }
+
+    // Iterate over each item in the array and create an object with the 'uri' property
+    const images = data.map((uri) => ({
+      uri: uri,
+    }));
+
+    return images;
+  };
+
+  const imagesArray = convertToImagesArray(images);
 
   return (
     <View style={styles.container}>
@@ -128,21 +133,25 @@ const MultipleImageUpload = () => {
         showsHorizontalScrollIndicator={false}
         style={{ flexDirection: "row", gap: 4 }}
       >
-        {instructorImages.length > 0
-          ? instructorImages.map((image, index) => (
-              <View style={styles.imageContainer} key={index}>
-                <Image source={{ uri: image }} style={styles.image} />
-              </View>
-            ))
-          : images.map((image, index) => (
-              <View style={styles.imageContainer} key={index}>
-                <Image source={{ uri: image }} style={styles.image} />
-              </View>
-            ))}
+        {images.map((image, index) => (
+          <TouchableOpacity
+            style={styles.imageContainer}
+            key={index}
+            onPress={handleImageViewer}
+          >
+            <Image source={{ uri: image }} style={styles.image} />
+          </TouchableOpacity>
+        ))}
+        <ImageView
+          images={imagesArray}
+          imageIndex={0}
+          visible={visible}
+          onRequestClose={() => setIsVisible(false)}
+        />
       </ScrollView>
-      {images.length === 0 && instructorImages.length === 0 && (
-        <TouchableOpacity style={styles.buttonStyle} onPress={handlePickImages}>
-          <Text style={styles.buttonText}>Choose Class Pictures</Text>
+      {images.length === 0 && (
+        <TouchableOpacity onPress={handlePickImages}>
+          {children}
         </TouchableOpacity>
       )}
       {images.length > 0 && !isImageUploaded && (
@@ -157,6 +166,7 @@ const MultipleImageUpload = () => {
           <TouchableOpacity style={styles.buttonStyle} onPress={uploadImages}>
             <Text style={styles.buttonText}>Upload</Text>
           </TouchableOpacity>
+          {children}
         </View>
       )}
     </View>
@@ -167,26 +177,24 @@ export default MultipleImageUpload;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    width: "100%",
   },
   buttonStyle: {
-    backgroundColor: Colors.primaryAlpha,
+    backgroundColor: Colors.primaryColor,
     padding: 12,
-    width: "90%",
+    width: "100%",
     borderRadius: 12,
     alignItems: "center",
     borderColor: Colors.white,
     borderWidth: 0.4,
   },
   buttonText: {
-    color: Colors.white,
+    color: Colors.black,
     fontWeight: "bold",
   },
   uploadProgressText: {
     marginTop: 10,
-    color: Colors.white,
+    color: Colors.black,
     fontWeight: "bold",
   },
   imageContainer: {
@@ -200,7 +208,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   uploadButton: {
-    backgroundColor: "#007AFF",
+    backgroundColor: Colors.primaryColor,
     padding: 8,
     borderRadius: 8,
     alignItems: "center",

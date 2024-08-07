@@ -1,18 +1,19 @@
+import { useState } from "react";
 import {
-  View,
-  Text,
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  ScrollView,
   StyleSheet,
+  Text,
   TextInput,
   TouchableOpacity,
-  ActivityIndicator,
-  Image,
-  Alert,
+  View,
 } from "react-native";
-import Colors from "../constants/Colors";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { useDispatch } from "react-redux";
 import CustomStatusBar from "../components/CustomStatusBar";
-import { useDispatch, useSelector } from "react-redux";
-import { useState } from "react";
+import Colors from "../constants/Colors";
 import { updateResetPassword } from "../features/auth/authActions";
 
 const ResetPassword = ({ route, navigation }) => {
@@ -25,8 +26,6 @@ const ResetPassword = ({ route, navigation }) => {
     confirmNewPassword: "",
   });
 
-  console.log("resetPassword: ", resetPassword);
-
   const resetFields = () => {
     setResetPassword({
       ...resetPassword,
@@ -34,8 +33,6 @@ const ResetPassword = ({ route, navigation }) => {
       confirmNewPassword: "",
     });
   };
-
-  console.log("resetPassword: ", resetPassword);
 
   const handleResetPassword = async () => {
     if (
@@ -48,10 +45,13 @@ const ResetPassword = ({ route, navigation }) => {
           updateResetPassword(resetPassword)
         );
         if (dispatchResetPassword.payload.status === "Success") {
-          Alert.alert(dispatchResetPassword.payload.message);
-          resetFields();
-          navigation.navigate("Signin");
-          return;
+          setTimeout(() => {
+            resetFields();
+            Alert.alert(dispatchResetPassword.payload.message);
+          }, 600);
+          return setTimeout(() => {
+            navigation.navigate("Signin");
+          }, 500);
         } else {
           Alert.alert(dispatchResetPassword.payload.error);
           return;
@@ -68,113 +68,98 @@ const ResetPassword = ({ route, navigation }) => {
   return (
     <SafeAreaProvider>
       <CustomStatusBar backgroundColor={Colors.primaryDark} />
-      <View style={styles.container}>
-        <View
-          style={{
-            width: "90%",
-            height: 240,
-            alignItems: "center",
-            justifyContent: "flex-end",
-            position: "relative",
-          }}
-        >
-          <Image
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
+        <ScrollView contentContainerStyle={styles.container}>
+          <View
             style={{
-              width: 70,
-              height: 70,
-              position: "absolute",
-              top: 50,
-              right: 3,
+              width: "90%",
+              height: 240,
+              alignItems: "center",
+              justifyContent: "flex-end",
+              position: "relative",
             }}
-            source={require("../../assets/512-fithubs.png")}
-          />
+          >
+            <Image
+              style={styles.imgContainer}
+              source={require("../../assets/parkingmateWelcome.png")}
+            />
+          </View>
 
-          <Image
-            style={styles.imgContainer}
-            source={require("../../assets/blue-img.png")}
-          />
-        </View>
-
-        <View
-          style={{
-            width: "95%",
-            alignItems: "center",
-            gap: 5,
-            //   marginTop: 1,
-          }}
-        >
-          {/* <TextInput style={styles.inputStyle} placeholder="Email Address" />
+          <View
+            style={{
+              width: "95%",
+              alignItems: "center",
+              gap: 5,
+              //   marginTop: 1,
+            }}
+          >
+            {/* <TextInput style={styles.inputStyle} placeholder="Email Address" />
         <TextInput style={styles.inputStyle} placeholder="Password" /> */}
-          {/* <Text style={{ fontSize: 24 }}>Forget Password </Text> */}
-          <Text
+            {/* <Text style={{ fontSize: 24 }}>Forget Password </Text> */}
+            <Text
+              style={{
+                color: Colors.primaryColor,
+                fontSize: 30,
+                fontWeight: "bold",
+              }}
+            >
+              Forget Password
+            </Text>
+          </View>
+          <View
             style={{
-              color: "#0741ad",
-              fontSize: 30,
-              fontWeight: "bold",
+              width: "90%",
+              alignItems: "center",
+              gap: 10,
+              marginTop: 10,
             }}
           >
-            Forget Password
-          </Text>
-          {/* <Text
-          style={{
-            fontSize: 14,
-            fontWeight: "bold",
-            color: "#b3b3b3",
-            marginTop: 8,
-          }}
-        >
-          Find your trainer, instantly from the App
-        </Text> */}
-        </View>
-        <View
-          style={{
-            // backgroundColor: "red",
-            width: "90%",
-            alignItems: "center",
-            gap: 10,
-            marginTop: 10,
-          }}
-        >
-          <TextInput
-            style={styles.inputStyle}
-            autoCapitalize="none"
-            placeholder="New Password"
-            onChangeText={(text) =>
-              setResetPassword({ ...resetPassword, password: text })
-            }
-            value={resetPassword.password}
-          />
-          <TextInput
-            style={styles.inputStyle}
-            autoCapitalize="none"
-            placeholder="Confirm Password"
-            onChangeText={(text) =>
-              setResetPassword({ ...resetPassword, confirmNewPassword: text })
-            }
-            value={resetPassword.confirmNewPassword}
-          />
-        </View>
+            <TextInput
+              style={styles.inputStyle}
+              autoCapitalize="none"
+              placeholder="New Password"
+              onChangeText={(text) =>
+                setResetPassword({ ...resetPassword, password: text })
+              }
+              value={resetPassword.password}
+              textContentType="newPassword"
+              secureTextEntry={true}
+            />
+            <TextInput
+              style={styles.inputStyle}
+              autoCapitalize="none"
+              placeholder="Confirm Password"
+              onChangeText={(text) =>
+                setResetPassword({ ...resetPassword, confirmNewPassword: text })
+              }
+              value={resetPassword.confirmNewPassword}
+              secureTextEntry={true}
+            />
+          </View>
 
-        <View style={{ width: "90%", alignItems: "center" }}>
-          <TouchableOpacity
-            style={styles.buttonStyle}
-            onPress={handleResetPassword}
-          >
-            <Text style={styles.buttonText}>Reset</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={{ marginVertical: 25 }}>
-          <Text style={{ fontSize: 14, fontWeight: "bold", color: "#b3b3b3" }}>
-            Back to{" "}
-            <Text
-              style={{ color: "#0741ad" }}
-              onPress={() => navigation.navigate("Signin")}
+          <View style={{ width: "90%", alignItems: "center" }}>
+            <TouchableOpacity
+              style={styles.buttonStyle}
+              onPress={handleResetPassword}
             >
-              Sign in
+              <Text style={styles.buttonText}>Reset</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={{ marginVertical: 25 }}>
+            <Text
+              style={{ fontSize: 14, fontWeight: "bold", color: "#b3b3b3" }}
+            >
+              Back to{" "}
+              <Text
+                style={{ color: Colors.primaryColor }}
+                onPress={() => navigation.navigate("Signin")}
+              >
+                Sign in
+              </Text>
             </Text>
-          </Text>
-        </View>
-      </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaProvider>
   );
 };
@@ -202,7 +187,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   buttonStyle: {
-    backgroundColor: "#0741ad",
+    backgroundColor: Colors.primaryColor,
     padding: 12,
     width: "90%",
     borderRadius: 12,

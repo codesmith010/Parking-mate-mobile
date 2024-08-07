@@ -1,6 +1,6 @@
-import React from "react";
-import { View, ImageBackground, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import React from "react";
+import { ImageBackground, StyleSheet } from "react-native";
 
 const ImageOverlay = ({ source, children }) => {
   return (

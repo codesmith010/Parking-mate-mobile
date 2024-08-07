@@ -1,13 +1,13 @@
-import React, { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
 import { MAP_KEY } from "@env";
-import Constants from "expo-constants";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import axios from "axios";
+import Constants from "expo-constants";
+import React, { useState } from "react";
+import { LogBox, Pressable, StyleSheet, Text, View } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import MapView, { Marker } from "react-native-maps";
-import axios from "axios";
-import { LogBox } from "react-native";
+import Colors from "../constants/Colors";
 
 LogBox.ignoreLogs([
   "Non-serializable values were found in the navigation state",
@@ -18,8 +18,6 @@ const Address = ({ route, navigation }) => {
   const [mapRegion, setMapRegion] = useState(null);
   const [isTyping, setIsTyping] = useState(false);
   // const { onAddressSelect } = route.params;
-
-  console.log("MAP__KEY: ", MAP_KEY);
 
   const handlePlaceSelect = async (data, details = null) => {
     try {
@@ -63,9 +61,11 @@ const Address = ({ route, navigation }) => {
         address: data.description,
         city,
         country,
+        lat: location.latitude,
+        lng: location.longitude,
       });
     } catch (error) {
-      console.error("Error fetching place details:", error);
+      // console.error("Error fetching place details:", error);
       setSelectedLocation(null);
     }
   };
@@ -91,18 +91,20 @@ const Address = ({ route, navigation }) => {
             justifyContent: "space-between",
             alignItems: "center",
             paddingBottom: 5,
+            backgroundColor: Colors.white,
+            padding: 10,
+            borderBottomColor: Colors.primaryAlpha,
+            borderBottomWidth: 2,
           }}
         >
           <Pressable onPress={() => navigation.goBack()}>
             <FontAwesomeIcon
               icon={faArrowLeft}
-              style={{ color: "#0741ad" }}
+              style={{ color: Colors.primaryDark }}
               size={28}
             />
           </Pressable>
-          <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-            Enter your Address
-          </Text>
+          <Text style={{ fontSize: 16 }}>Enter your Address</Text>
           <Text></Text>
         </View>
         <GooglePlacesAutocomplete
@@ -113,6 +115,7 @@ const Address = ({ route, navigation }) => {
             language: "en",
           }}
           textInputProps={{
+            autoFocus: true,
             onFocus: () => setIsTyping(true),
             onBlur: () => setIsTyping(false),
           }}
@@ -138,8 +141,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-
-    padding: 10,
     paddingTop: Constants.statusBarHeight + 10,
     backgroundColor: "#ecf0f1",
   },

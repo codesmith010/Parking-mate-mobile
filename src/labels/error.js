@@ -1,0 +1,23 @@
+export const ERRORS = {
+  noInternet: "No Internet Connection",
+  somethingWent: "Something went wrong, please try again later!",
+  fieldsReq: "Please fill out all required fields.",
+  enterFirstName: "Please enter a valid first name",
+  enterLastName: "Please enter a valid last name",
+  enterUserName: "Please enter a valid username",
+  enterEmail: "Please enter a valid email",
+  enterPassword: "Please enter a valid password",
+  enterNewPassword: "Please enter a new password",
+  emptyPassword: "Password cannot be empty",
+  enterConfirmPassword: "Both passwords should be same",
+  enterCurrentPassword: "Please enter a current password",
+  passwordValidation: "Password enter a valid password",
+  enterPhoneNumber: "Enter your phone number to proceed",
+  enterValidPhoneNumber: "Enter valid phone number to proceed",
+  tooManyRequest: "Too many request, try again later",
+  otpSent: "OTP has been sent to your phone number",
+  otpVerifyError:
+    "Unable to verify OTP. Please ensure you've entered the correct code and try again.",
+  otpVerifySuccess: "Phone number verification successful",
+  otpError: "Enter 6 digit OTP code to proceed",
+};

@@ -1,10 +1,10 @@
 import React, {
-  useState,
-  useImperativeHandle,
   forwardRef,
+  useImperativeHandle,
   useRef,
+  useState,
 } from "react";
-import { Text, StyleSheet, Animated, Platform, UIManager } from "react-native";
+import { Animated, Platform, StyleSheet, Text, UIManager } from "react-native";
 
 if (
   Platform.OS === "android" &&
@@ -15,9 +15,11 @@ if (
 
 const Toast = (props, ref) => {
   const [showToast, setShowToast] = useState(false);
+  const [message, setMessage] = useState("");
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  const toast = () => {
+  const toast = (msg) => {
+    setMessage(msg);
     if (!showToast) {
       setShowToast(true);
       Animated.timing(fadeAnim, {
@@ -28,23 +30,24 @@ const Toast = (props, ref) => {
       setTimeout(() => {
         Animated.timing(fadeAnim, {
           toValue: 0,
-          duration: 500,
+          duration: 400,
           useNativeDriver: true,
         }).start(() => {
           setShowToast(false);
+          setMessage(""); // Clear the message after hiding the toast
         });
-      }, 3000);
+      }, 2000);
     }
   };
 
   useImperativeHandle(ref, () => ({
-    toast,
+    toast: toast,
   }));
 
   if (showToast) {
     return (
       <Animated.View style={[styles.toastContainer, { opacity: fadeAnim }]}>
-        <Text style={styles.toastText}>{props.message}</Text>
+        <Text style={styles.toastText}>{message}</Text>
       </Animated.View>
     );
   } else {

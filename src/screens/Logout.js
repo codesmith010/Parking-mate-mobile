@@ -1,20 +1,29 @@
 import { useEffect } from "react";
-import clearToken from "../services/clearToken";
-import { useDispatch, useSelector } from "react-redux";
-import { logoutUser } from "../features/auth/authSlice";
 import { Alert } from "react-native";
+
+import { logoutUser } from "../features/auth/authSlice";
+import { resetBalance } from "../features/balance/balanceSlice";
+import { resetAllDriverData } from "../features/driver/driverSlice";
+import { resetAllDrivingHostData } from "../features/drivingHost/drivingHostSlice";
+import { resetEarning } from "../features/earning/earningSlice";
+import clearToken from "../services/clearToken";
+import { dispatch, useSelector } from "../store/store";
 
 const Logout = ({ navigation }) => {
   const { user } = useSelector((state) => state.user);
-  const dispatch = useDispatch();
 
   const handleLogout = async () => {
     try {
-      navigation.replace("Splash");
+      dispatch(resetAllDriverData());
+      dispatch(resetAllDrivingHostData());
+      dispatch(resetBalance());
+      dispatch(resetEarning());
       dispatch(logoutUser());
+      navigation.replace("Welcome");
+
       clearToken();
     } catch (error) {
-      console.error("Logout error:", error);
+      // console.error("Logout error:", error);
       Alert.alert(
         "Logout Failed",
         "An error occurred while logging out. Please try again."

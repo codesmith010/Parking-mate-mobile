@@ -3,7 +3,6 @@ async function getToken() {
   let result = await SecureStore.getItemAsync("userToken");
   if (result) {
     const token = result.toString();
-    console.log(token);
     // alert("🔐 Here's your value 🔐 \n" + result);
     return token;
   } else {

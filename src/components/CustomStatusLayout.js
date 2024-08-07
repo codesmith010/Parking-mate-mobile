@@ -1,8 +1,7 @@
-import { View, Text } from "react-native";
 import React from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import CustomStatusBar from "./CustomStatusBar";
 import Colors from "../constants/Colors";
+import CustomStatusBar from "./CustomStatusBar";
 
 const CustomStatusLayout = ({ children }) => {
   return (

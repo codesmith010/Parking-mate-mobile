@@ -1,31 +1,16 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Button,
-  Alert,
-  ActivityIndicator,
-} from "react-native";
-import * as ImagePicker from "expo-image-picker";
+import { faCamera, faUpload } from "@fortawesome/free-solid-svg-icons";
 import storage from "@react-native-firebase/storage";
+import * as ImagePicker from "expo-image-picker";
+import React, { useEffect, useState } from "react";
+import { Alert, Image, StyleSheet, TouchableOpacity, View } from "react-native";
+
 import Colors from "../constants/Colors";
-import { useDispatch, useSelector } from "react-redux";
-import Icon, { Icons } from "./Icon";
-import {
-  faCamera,
-  faCloudUpload,
-  faFileUpload,
-  faU,
-  faUpload,
-} from "@fortawesome/free-solid-svg-icons";
 import {
   fetchProfilePicture,
   uploadProfilePicture,
 } from "../features/auth/authActions";
+import { dispatch, useSelector } from "../store/store";
+import Icon, { Icons } from "./Icon";
 
 const SingleImageUpload = () => {
   const { user, isLoading, error, profilePicture } = useSelector(
@@ -35,19 +20,12 @@ const SingleImageUpload = () => {
   const [uploadProgress, setUploadProgress] = useState(null);
   const [uploadedImages, setUploadedImages] = useState(0);
   const [isImageUploaded, setIsImageUploaded] = useState(false);
-  // const [totalImages, setTotalImages] = useState(0);
-  const totalImages = images.length;
 
-  const dispatch = useDispatch();
+  const totalImages = images.length;
 
   useEffect(() => {
     dispatch(fetchProfilePicture({ userID: user._id }));
   }, [isImageUploaded]);
-
-  console.log("profilePic: ", profilePicture === "");
-  console.log("images: ", images);
-
-  console.log("user::: ", user);
 
   const handlePickImages = async () => {
     try {
@@ -65,7 +43,7 @@ const SingleImageUpload = () => {
         setImages(selectedImages);
       }
     } catch (error) {
-      console.log("Error @handlePickImages: ", error);
+      // console.log("Error @handlePickImages: ", error);
       Alert.alert("Error, An error occurred while picking images");
     }
   };
@@ -74,14 +52,14 @@ const SingleImageUpload = () => {
     let allImagesSrc = [];
     let uploadedImagesCount = 0;
     for (const imageUri of images) {
-      console.log("Uploading image: ", imageUri);
+      // console.log("Uploading image: ", imageUri);
       const imageName = imageUri.substring(imageUri.lastIndexOf("/") + 1);
       const reference = storage().ref(imageName);
       const pathToFile = imageUri;
 
       try {
         const exists = await reference.getDownloadURL();
-        console.log("Image already exists: ", exists);
+        // console.log("Image already exists: ", exists);
         Alert.alert("Error", "Image already exists");
         return;
       } catch (error) {
@@ -99,10 +77,6 @@ const SingleImageUpload = () => {
           allImagesSrc.push(downloadURL);
           setUploadedImages((uploadedImages) => uploadedImages + 1);
           uploadedImagesCount = uploadedImagesCount + 1;
-
-          console.log("UploadedImages: ", uploadedImagesCount);
-          console.log("TotalImages: ", totalImages);
-          console.log("AllImagesSrc: ", allImagesSrc);
 
           if (uploadedImagesCount === totalImages) {
             // All images are uploaded
@@ -125,16 +99,13 @@ const SingleImageUpload = () => {
             return;
           }
         } catch (uploadError) {
-          console.error("Error uploading image: ", uploadError);
+          // console.error("Error uploading image: ", uploadError);
           Alert.alert("Error", "An error occurred while uploading images");
           return;
         }
       }
     }
   };
-
-  console.log("images: ", images);
-  console.log("profilePicture: ", profilePicture);
 
   return (
     <View style={styles.container}>
@@ -192,11 +163,6 @@ const SingleImageUpload = () => {
           </TouchableOpacity>
         )}
       </View>
-      {/* {images.length !== 0 && (
-        <TouchableOpacity style={styles.buttonStyle} onPress={uploadImages}>
-          <Text style={styles.buttonText}>Upload Image</Text>
-        </TouchableOpacity>
-      )} */}
     </View>
   );
 };
@@ -238,7 +204,7 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     borderWidth: 3,
-    borderColor: "#03DAC6",
+    borderColor: Colors.primaryDark,
     width: 120,
     height: 120,
     // backgroundColor: "#e5e5e5",

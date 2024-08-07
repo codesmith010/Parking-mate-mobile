@@ -10,6 +10,8 @@ import {
   fetchProfilePicture,
   sendForgetPasswordOtp,
   verifyForgetPasswordOtp,
+  sentSmsOTP,
+  verifySmsOTP,
 } from "./authActions";
 
 const initialState = {
@@ -186,6 +188,30 @@ const userSlice = createSlice({
       state.isLoading = false;
       state.error = action.payload.message;
       state.forgetPasswordOtpCode = null;
+    });
+    builder.addCase(sentSmsOTP.pending, (state) => {
+      state.isLoading = true;
+      state.error = null;
+    });
+    builder.addCase(sentSmsOTP.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.error = null;
+    });
+    builder.addCase(sentSmsOTP.rejected, (state, action) => {
+      state.isLoading = false;
+      // state.error = action.payload.message;
+    });
+    builder.addCase(verifySmsOTP.pending, (state) => {
+      state.isLoading = true;
+      state.error = null;
+    });
+    builder.addCase(verifySmsOTP.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.error = null;
+    });
+    builder.addCase(verifySmsOTP.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload.message;
     });
   },
 });

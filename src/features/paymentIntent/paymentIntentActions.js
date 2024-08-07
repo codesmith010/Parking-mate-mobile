@@ -1,40 +1,13 @@
 import axios from "axios";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { BASE_URL } from "@env";
-
-// Async action for fetching classes
-export const createPaymentIntent = createAsyncThunk(
-  "book/create",
-  async (paymentData, thunkAPI) => {
-    try {
-      console.log("paymentData: ", paymentData);
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-          Authoritzation: paymentData.userToken,
-        },
-      };
-
-      // Make an API call to create advertiseClassData
-      const response = await axios.post(
-        `${BASE_URL}/payment/create-payment-intent`, // Replace with your actual API endpoint
-        paymentData,
-        config
-      );
-
-      return response.data;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
-    }
-  }
-);
+import { PATH } from "../../constants/endpoints";
+import { API } from "../../services/api";
 
 // Async action for fetching classes
 export const getPaymentIntent = createAsyncThunk(
-  "instructorpayment/history",
+  "payment/history",
   async (userData, thunkAPI) => {
     try {
-      console.log("paymentData: ", userData.userToken);
       const config = {
         headers: {
           "Content-Type": "application/json",
@@ -44,7 +17,7 @@ export const getPaymentIntent = createAsyncThunk(
 
       // Make an API call to create advertiseClassData
       const response = await axios.get(
-        `${BASE_URL}/instructor-payment/get/${userData._id}`, // Replace with your actual API endpoint
+        `${BASE_URL}/payment/get/${userData._id}`, // Replace with your actual API endpoint
         config
       );
 
@@ -55,31 +28,148 @@ export const getPaymentIntent = createAsyncThunk(
   }
 );
 
-export const fetchPaymentIntentClientSecret = async (
-  firstName,
-  email,
-  amount,
-  token
-) => {
-  const response = await fetch(`${BASE_URL}/payment/create-payment-intent`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: token,
-    },
-    body: JSON.stringify({
-      // params: {
-      //   amount: 1099,
-      //   currency: "usd",
-      //   payment_method_types: ["card"],
-      // },
-      firstName: firstName,
-      email: email,
-      amount: amount,
-      currency: "usd",
-      payment_method_types: ["card"],
-    }),
-  });
-  const { clientSecret, error } = await response.json();
-  return { clientSecret, error };
-};
+// Async action for creating balance
+
+export const fetchPaymentIntentClientSecret = createAsyncThunk(
+  "payment/create",
+  async (params, thunkAPI) => {
+    try {
+      const {
+        successCallback = () => {},
+        errorCallback = () => {},
+        payload,
+      } = params;
+      const options = {
+        method: "POST",
+        endpoint: PATH.payment.create,
+        isToken: true,
+        payload: payload,
+      };
+
+      const [ok, response] = await API(options);
+      if (!ok || !response) return errorCallback(response.error);
+
+      successCallback(response);
+      // const { clientSecret, error } = await response.json();
+      // return { clientSecret, error };
+
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const fetchWithdrawPaymentIntentClientSecret = createAsyncThunk(
+  "payment/withdraw/create",
+  async (params, thunkAPI) => {
+    try {
+      const {
+        successCallback = () => {},
+        errorCallback = () => {},
+        payload,
+      } = params;
+      const options = {
+        method: "POST",
+        endpoint: PATH.payment.createWithdraw,
+        isToken: true,
+        payload: payload,
+      };
+
+      const [ok, response] = await API(options);
+      if (!ok || !response) return errorCallback(response.error);
+
+      successCallback(response);
+      // const { clientSecret, error } = await response.json();
+      // return { clientSecret, error };
+
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const fetchOnBoardingStatus = createAsyncThunk(
+  "payment/onboarding/status",
+  async (params, thunkAPI) => {
+    try {
+      const {
+        successCallback = () => {},
+        errorCallback = () => {},
+        payload,
+      } = params;
+      const options = {
+        method: "POST",
+        endpoint: PATH.payment.onboarding,
+        isToken: true,
+        payload: payload,
+      };
+
+      const [ok, response] = await API(options);
+      if (!ok || !response) return errorCallback(response.error);
+
+      successCallback(response);
+
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const updateWithdrawPayment = createAsyncThunk(
+  "payment/withdraw/update",
+  async (params, thunkAPI) => {
+    try {
+      const {
+        successCallback = () => {},
+        errorCallback = () => {},
+        payload,
+      } = params;
+      const options = {
+        method: "PUT",
+        endpoint: PATH.payment.updateWithdraw,
+        isToken: true,
+        payload: payload,
+      };
+
+      const [ok, response] = await API(options);
+      if (!ok || !response) return errorCallback(response.error);
+
+      successCallback(response);
+
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const transferPayment = createAsyncThunk(
+  "payment/withdraw/transfer",
+  async (params, thunkAPI) => {
+    try {
+      const {
+        successCallback = () => {},
+        errorCallback = () => {},
+        payload,
+      } = params;
+      const options = {
+        method: "POST",
+        endpoint: PATH.payment.createPaymentTransfer,
+        isToken: true,
+        payload: payload,
+      };
+
+      const [ok, response] = await API(options);
+      if (!ok || !response) return errorCallback(response.error);
+
+      successCallback(response);
+
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);

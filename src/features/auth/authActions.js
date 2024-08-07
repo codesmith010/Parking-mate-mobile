@@ -1,45 +1,51 @@
 import axios from "axios";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { BASE_URL } from "@env";
+import { PATH } from "../../constants/endpoints";
+import { API } from "../../services/api";
 
 // Async action for user login
 export const login = createAsyncThunk(
   "user/signin",
-  async (userData, thunkAPI) => {
+  async (params, thunkAPI) => {
     try {
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      };
-      console.log("userdata: ", userData);
+      const {
+        successCallback = () => {},
+        errorCallback = () => {},
+        payload,
+      } = params;
 
-      const response = await axios.post(
-        `${BASE_URL}/user/signin`,
-        userData,
-        config
-      ); // Replace with your actual login API function
-      return response.data;
+      const options = {
+        method: "POST",
+        endpoint: PATH.auth.login,
+        isToken: false,
+        payload: payload,
+      };
+      const [ok, response] = await API(options);
+      if (!ok || !response) return errorCallback(response.error);
+      successCallback(response.message);
+      return response;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
+      errorCallback(error);
+      return thunkAPI.rejectWithValue(error);
     }
   }
 );
+
 export const updateLogin = createAsyncThunk(
   "user/updatesignin",
-  async (token, thunkAPI) => {
+  async (params, thunkAPI) => {
     try {
-      console.log("MYYYYYYYtoken: ", token);
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token,
-        },
+      const options = {
+        method: "GET",
+        endpoint: PATH.auth.updateLogin,
+        isToken: true,
       };
-      const response = await axios.get(`${BASE_URL}/user/updatesignin`, config); // Replace with your actual login API function
-      return response.data;
+      const [ok, response] = await API(options);
+      return response;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
+      errorCallback(error);
+      return thunkAPI.rejectWithValue(error);
     }
   }
 );
@@ -47,30 +53,62 @@ export const updateLogin = createAsyncThunk(
 // Async action for user signup
 export const signup = createAsyncThunk(
   "user/signup",
-  async (userData, thunkAPI) => {
+  async (params, thunkAPI) => {
     try {
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const {
+        successCallback = () => {},
+        errorCallback = () => {},
+        payload,
+      } = params;
+
+      const options = {
+        method: "POST",
+        endpoint: PATH.auth.register,
+        isToken: false,
+        payload: payload,
       };
-
-      const response = await axios.post(
-        `${BASE_URL}/user/signup`,
-        userData,
-        config
-      ); // Replace with your actual signup API function
-
-      return response.data;
+      const [ok, response] = await API(options);
+      if (!ok || !response) return errorCallback(response.error);
+      successCallback(response.message);
+      return response;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
+      errorCallback(error);
+      return thunkAPI.rejectWithValue(error);
     }
   }
 );
+
+// Async action for delete user
+export const deleteUser = createAsyncThunk(
+  "user/deleteUser",
+  async (params, thunkAPI) => {
+    try {
+      const {
+        successCallback = () => {},
+        errorCallback = () => {},
+        payload,
+      } = params;
+
+      const options = {
+        method: "POST",
+        endpoint: PATH.auth.deleteUser,
+        isToken: true,
+        payload: payload,
+      };
+      const [ok, response] = await API(options);
+      if (!ok || !response) return errorCallback(response.error);
+      successCallback(response.message);
+      return response;
+    } catch (error) {
+      errorCallback(error);
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
 export const sendOtp = createAsyncThunk(
   "/user/signup/emailotp/sent",
   async (userData, thunkAPI) => {
-    console.log("userData: ", userData);
     try {
       const config = {
         headers: {
@@ -93,7 +131,6 @@ export const sendOtp = createAsyncThunk(
 export const verifyOtp = createAsyncThunk(
   "/user/signup/emailotp/verify",
   async (userData, thunkAPI) => {
-    console.log("userData: ", userData);
     try {
       const config = {
         headers: {
@@ -106,11 +143,9 @@ export const verifyOtp = createAsyncThunk(
         config
       ); // Replace with your actual signup API function
 
-      console.log("ERRORRR: ", response.data);
-
       return response.data;
     } catch (error) {
-      console.log("ERRORRR: ", error);
+      // console.log("ERRORRR: ", error);
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }
@@ -119,7 +154,6 @@ export const verifyOtp = createAsyncThunk(
 export const sendForgetPasswordOtp = createAsyncThunk(
   "/user/forgetPassword/emailotp/sent",
   async (userData, thunkAPI) => {
-    console.log("userData: ", userData);
     try {
       const config = {
         headers: {
@@ -141,7 +175,6 @@ export const sendForgetPasswordOtp = createAsyncThunk(
 export const verifyForgetPasswordOtp = createAsyncThunk(
   "/user/forgetPassword/emailotp/verify",
   async (userData, thunkAPI) => {
-    console.log("userData: ", userData);
     try {
       const config = {
         headers: {
@@ -163,7 +196,6 @@ export const verifyForgetPasswordOtp = createAsyncThunk(
 export const updateResetPassword = createAsyncThunk(
   "/user/resetPassword/update",
   async (userData, thunkAPI) => {
-    console.log("userData: ", userData);
     try {
       const config = {
         headers: {
@@ -187,7 +219,6 @@ export const updatePassword = createAsyncThunk(
   "user/updatePassword",
   async (changePass, thunkAPI) => {
     try {
-      console.log("MYYYYYYYtoken: ", changePass);
       const config = {
         headers: {
           "Content-Type": "application/json",
@@ -205,11 +236,10 @@ export const updatePassword = createAsyncThunk(
     }
   }
 );
-export const uploadInstructorImages = createAsyncThunk(
-  "user/uploadInstructorImages",
+export const uploadDriverHostImages = createAsyncThunk(
+  "user/uploadDriverHostImages",
   async (imagesData, thunkAPI) => {
     try {
-      console.log("MYYYYYYYtoken: ", imagesData);
       const config = {
         headers: {
           "Content-Type": "application/json",
@@ -217,7 +247,7 @@ export const uploadInstructorImages = createAsyncThunk(
         },
       };
       const response = await axios.post(
-        `${BASE_URL}/user/image/instructorClass/save`,
+        `${BASE_URL}/parking-space/image/driverHost/save`,
         imagesData,
         config
       ); // Replace with your actual login API function
@@ -231,7 +261,6 @@ export const fetchInstructorImages = createAsyncThunk(
   "user/fetchInstructorImages",
   async (userID, thunkAPI) => {
     try {
-      console.log("MYYYYYYYtoken: ", userID);
       const config = {
         headers: {
           "Content-Type": "application/json",
@@ -254,7 +283,6 @@ export const uploadProfilePicture = createAsyncThunk(
   "user/uploadProfilePicture",
   async (imagesData, thunkAPI) => {
     try {
-      console.log("MYYYYYYYtoken: ", imagesData);
       const config = {
         headers: {
           "Content-Type": "application/json",
@@ -276,7 +304,6 @@ export const fetchProfilePicture = createAsyncThunk(
   "user/fetchProfilePicture",
   async (userID, thunkAPI) => {
     try {
-      console.log("MYYYYYYYtoken: ", userID);
       const config = {
         headers: {
           "Content-Type": "application/json",
@@ -291,6 +318,61 @@ export const fetchProfilePicture = createAsyncThunk(
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// Phone verification actions
+export const sentSmsOTP = createAsyncThunk(
+  "user/sentSmsOTP",
+  async (params, thunkAPI) => {
+    try {
+      const {
+        successCallback = () => {},
+        errorCallback = () => {},
+        payload,
+      } = params;
+
+      const options = {
+        method: "POST",
+        endpoint: PATH.auth.sentSmsOTP,
+        isToken: true,
+        payload: payload,
+      };
+      const [ok, response] = await API(options);
+      if (!ok || !response) return errorCallback(response.error);
+      successCallback(response);
+      return response;
+    } catch (error) {
+      errorCallback(error);
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+export const verifySmsOTP = createAsyncThunk(
+  "user/verifySmsOTP",
+  async (params, thunkAPI) => {
+    try {
+      const {
+        successCallback = () => {},
+        errorCallback = () => {},
+        payload,
+      } = params;
+
+      const options = {
+        method: "POST",
+        endpoint: PATH.auth.verifySmsOTP,
+        isToken: true,
+        payload: payload,
+      };
+      const [ok, response] = await API(options);
+      if (!ok || !response) return errorCallback(response.error);
+      successCallback(response);
+      return response;
+    } catch (error) {
+      errorCallback(error);
+      return thunkAPI.rejectWithValue(error);
     }
   }
 );

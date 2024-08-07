@@ -1,17 +1,12 @@
 import React from "react";
 import {
-  StyleSheet,
-  View,
-  Text,
-  TextInput,
   Image,
-  Pressable,
-  TouchableOpacity,
   LogBox,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import BouncyCheckbox from "react-native-bouncy-checkbox";
-
-import CustomStatusLayout from "../components/CustomStatusLayout";
 import Colors from "../constants/Colors";
 
 const Welcome = ({ navigation }) => {
@@ -22,15 +17,15 @@ const Welcome = ({ navigation }) => {
     <View style={styles.container}>
       <View
         style={{
-          width: 280,
-          height: 280,
+          width: "50%",
+          height: 240,
           justifyContent: "center",
           alignItems: "center",
         }}
       >
         <Image
           style={styles.imgContainer}
-          source={require("../../assets/blue-img.png")}
+          source={require("../../assets/parkingmateWelcome.png")}
         />
       </View>
       <View
@@ -40,8 +35,6 @@ const Welcome = ({ navigation }) => {
           gap: 5,
         }}
       >
-        {/* <TextInput style={styles.inputStyle} placeholder="Email Address" />
-        <TextInput style={styles.inputStyle} placeholder="Password" /> */}
         <Text style={{ fontSize: 24 }}>Welcome to</Text>
         <Text style={{ fontSize: 30, fontWeight: "bold" }}>Parking Mate</Text>
         <Text
@@ -52,7 +45,7 @@ const Welcome = ({ navigation }) => {
             marginTop: 8,
           }}
         >
-          Find your trainer, instantly from the App
+          Find your parking space, instantly from the App
         </Text>
       </View>
       <View style={{ width: "90%", alignItems: "center", gap: 22 }}>
@@ -89,9 +82,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   imgContainer: {
-    width: 240,
-    height: 280,
-    // backgroundColor: "red",
+    width: 200,
+    height: 200,
   },
   inputStyle: {
     color: "#999999",

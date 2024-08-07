@@ -1,31 +1,23 @@
 import {
-  Image,
-  ImageBackground,
-  Linking,
-  Text,
-  View,
-  Pressable,
-} from "react-native";
-import React from "react";
-import {
   DrawerContentScrollView,
   DrawerItemList,
 } from "@react-navigation/drawer";
-import Colors from "../constants/Colors";
+import React from "react";
 import {
-  faFacebook,
-  faPersonRifle,
-  faPray,
-} from "@fortawesome/free-solid-svg-icons";
-import Icon, { Icons } from "./Icon";
+  Image,
+  ImageBackground,
+  Linking,
+  Pressable,
+  Text,
+  View,
+} from "react-native";
 import { useSelector } from "react-redux";
+import Colors from "../constants/Colors";
 
 const CustomDrawer = (props) => {
   const { user, profilePicture, isLoading, error } = useSelector(
     (state) => state.user
   );
-
-  console.log("USER::: ", user);
 
   // handle Instagram Link
   const handleLinks = (url) => {
@@ -88,9 +80,9 @@ const CustomDrawer = (props) => {
           style={{
             flexDirection: "row",
             alignItems: "center",
-            gap: 30,
-            justifyContent: "center",
-            // flexWrap: "wrap",
+            paddingVertical: 6,
+            paddingHorizontal: 10,
+            gap: 20,
           }}
         >
           <Pressable
@@ -102,7 +94,7 @@ const CustomDrawer = (props) => {
             }}
             onPress={() =>
               handleLinks(
-                "https://www.facebook.com/profile.php?id=61551999556493"
+                "https://www.facebook.com/profile.php?id=61560005474976"
               )
             }
           >
@@ -110,7 +102,6 @@ const CustomDrawer = (props) => {
               style={{ width: 40, height: 40 }}
               source={require("../../assets/facebooklogo.png")}
             />
-            {/* <Text style={{ color: "black", fontWeight: 700 }}>Tiktok</Text> */}
           </Pressable>
           <Pressable
             style={{
@@ -119,15 +110,12 @@ const CustomDrawer = (props) => {
               alignItems: "center",
               gap: 5,
             }}
-            onPress={() =>
-              handleLinks("https://www.instagram.com/fithubs.app/")
-            }
+            onPress={() => handleLinks("https://www.instagram.com/parkingmate")}
           >
             <Image
               style={{ width: 40, height: 40 }}
               source={require("../../assets/instagramlogo.png")}
             />
-            {/* <Text style={{ color: "#f209ae", fontWeight: 700 }}>Instagram</Text> */}
           </Pressable>
           <Pressable
             style={{
@@ -136,7 +124,7 @@ const CustomDrawer = (props) => {
               alignItems: "center",
               gap: 5,
             }}
-            onPress={() => handleLinks("https://www.tiktok.com/@fithubs.app")}
+            onPress={() => handleLinks("https://www.tiktok.com/@parkingmate")}
           >
             <Image
               style={{ width: 40, height: 40 }}

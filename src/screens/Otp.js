@@ -1,67 +1,62 @@
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import React, { useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
+  Image,
+  KeyboardAvoidingView,
+  Pressable,
+  ScrollView,
   StyleSheet,
-  View,
   Text,
   TextInput,
-  Image,
-  Pressable,
-  ActivityIndicator,
   TouchableOpacity,
+  View,
 } from "react-native";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch, useSelector } from "react-redux";
-import { sendOtp, verifyOtp } from "../features/auth/authActions";
-import Toast from "../components/Toast";
-import { updateOtpStatus } from "../features/auth/authSlice";
 import CustomStatusLayout from "../components/CustomStatusLayout";
+import Toast from "../components/Toast";
+import Colors from "../constants/Colors";
+import { sendOtp, verifyOtp } from "../features/auth/authActions";
+import { updateOtpStatus } from "../features/auth/authSlice";
 
 const Otp = ({ route, navigation }) => {
   const { otpCode, otpStatus, otpSentStatus, isLoading, error } = useSelector(
     (state) => state.user
   );
   const [otpInput, setOtpInput] = useState(["", "", "", ""]);
-  console.log({ otpCode, otpStatus, otpSentStatus, isLoading, error });
 
   const { email } = route.params;
-  console.log("email: ", email, "otpStatus: ", otpStatus);
 
   const inputRefs = [useRef(null), useRef(null), useRef(null), useRef(null)];
 
   const SuccessToastRef = useRef(null);
-  const successShowToast = () => {
+  const successShowToast = (message) => {
     if (SuccessToastRef.current !== null) {
-      SuccessToastRef.current.toast();
+      SuccessToastRef.current.toast(message);
     }
   };
-  // const RedirectToastRef = useRef(null);
-  // const redirectShowToast = () => {
-  //   if (RedirectToastRef.current !== null) {
-  //     RedirectToastRef.current.toast();
-  //   }
-  // };
+
   const ErrorToastRef = useRef(null);
-  const errorShowToast = () => {
-    if (errorShowToast.current !== null) {
-      ErrorToastRef.current.toast();
+  const errorShowToast = (errorMessage) => {
+    if (ErrorToastRef.current !== null) {
+      ErrorToastRef.current.toast(errorMessage);
     }
   };
 
   const dispatch = useDispatch();
   useEffect(() => {
     if (error) {
-      errorShowToast();
+      errorShowToast(error);
       return;
     }
     if (otpStatus === "verified") {
-      console.log("Success");
-      successShowToast();
+      successShowToast("Verified, redirecting to Signin page");
       dispatch(updateOtpStatus());
       changeScreen();
       return;
     }
-    console.log("OTPcode: ", otpCode);
+
     if (otpSentStatus === "pending") {
       dispatch(sendOtp({ email: email }));
       return;
@@ -78,10 +73,6 @@ const Otp = ({ route, navigation }) => {
       inputRefs[index + 1].current.focus();
     }
   };
-  console.log("====================================");
-  console.log(...otpInput);
-  console.log("ANS: ", otpInput.every(Boolean));
-  console.log("====================================");
 
   const changeScreen = () => {
     // redirectShowToast();
@@ -91,11 +82,9 @@ const Otp = ({ route, navigation }) => {
   };
 
   const handleVerifyOtp = () => {
-    console.log("CLICKED ");
     if (otpStatus === null) {
       if (otpInput.every(Boolean)) {
         const myInputOTPCode = otpInput.join("");
-        console.log("HI: ", myInputOTPCode);
         dispatch(
           verifyOtp({
             email: email,
@@ -125,91 +114,97 @@ const Otp = ({ route, navigation }) => {
         <Pressable onPress={() => navigation.navigate("Signin")}>
           <FontAwesomeIcon
             icon={faArrowLeft}
-            style={{ color: "#0741ad" }}
+            style={{ color: Colors.primaryDark }}
             size={28}
           />
         </Pressable>
       </View>
-      <View style={styles.subcontainer}>
-        <View>
-          <Image
-            style={{ width: 180, height: 180 }}
-            source={require("../../assets/OTPImg.png")}
-          />
-        </View>
-        <View style={{ alignItems: "center", gap: 20 }}>
-          <View style={{ gap: 10 }}>
-            <Text
-              style={{ fontWeight: "bold", fontSize: 28, textAlign: "center" }}
-            >
-              OTP Verification
-            </Text>
-            <Text>Enter the OTP sent to your email</Text>
-          </View>
-          <View style={{ flexDirection: "row", gap: 5, paddingBottom: 25 }}>
-            <TextInput
-              ref={inputRefs[0]}
-              style={styles.inputStyle}
-              placeholder=""
-              maxLength={1}
-              value={otpInput[0]}
-              keyboardType="number-pad"
-              returnKeyType="done"
-              onChangeText={(text) => handleOtpInputChange(text, 0)}
-            />
-            <TextInput
-              ref={inputRefs[1]}
-              style={styles.inputStyle}
-              placeholder=""
-              maxLength={1}
-              value={otpInput[1]}
-              keyboardType="number-pad"
-              returnKeyType="done"
-              onChangeText={(text) => handleOtpInputChange(text, 1)}
-            />
-            <TextInput
-              ref={inputRefs[2]}
-              style={styles.inputStyle}
-              placeholder=""
-              maxLength={1}
-              value={otpInput[2]}
-              keyboardType="number-pad"
-              returnKeyType="done"
-              onChangeText={(text) => handleOtpInputChange(text, 2)}
-            />
-            <TextInput
-              ref={inputRefs[3]}
-              style={styles.inputStyle}
-              placeholder=""
-              maxLength={1}
-              value={otpInput[3]}
-              keyboardType="number-pad"
-              returnKeyType="done"
-              onChangeText={(text) => handleOtpInputChange(text, 3)}
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
+        <ScrollView contentContainerStyle={styles.subcontainer}>
+          <View>
+            <Image
+              style={{ width: 180, height: 180 }}
+              source={require("../../assets/OTPImg.png")}
             />
           </View>
-        </View>
-        <View style={{ width: "90%", alignItems: "center" }}>
-          {otpSentStatus === "pending" ? (
-            <Pressable style={styles.otpSendingBtnStyle}>
-              <Text style={styles.signupBtnText}>Sending OTP </Text>
-              <ActivityIndicator animating={isLoading} />
-            </Pressable>
-          ) : (
-            <TouchableOpacity
-              style={styles.signupBtnStyle}
-              onPress={handleVerifyOtp}
-            >
-              <Text style={styles.signupBtnText}>Verify</Text>
-            </TouchableOpacity>
-          )}
-          <Toast
-            ref={SuccessToastRef}
-            message={"Verified, redirecting to Signin page"}
-          />
-          <Toast ref={ErrorToastRef} message={error} />
-        </View>
-      </View>
+          <View style={{ alignItems: "center", gap: 20 }}>
+            <View style={{ gap: 10 }}>
+              <Text
+                style={{
+                  fontWeight: "bold",
+                  fontSize: 28,
+                  textAlign: "center",
+                }}
+              >
+                OTP Verification
+              </Text>
+              <Text>Enter the OTP sent to your email</Text>
+            </View>
+            <View style={{ flexDirection: "row", gap: 5, paddingBottom: 25 }}>
+              <TextInput
+                ref={inputRefs[0]}
+                style={styles.inputStyle}
+                placeholder=""
+                maxLength={1}
+                value={otpInput[0]}
+                keyboardType="number-pad"
+                returnKeyType="done"
+                onChangeText={(text) => handleOtpInputChange(text, 0)}
+              />
+              <TextInput
+                ref={inputRefs[1]}
+                style={styles.inputStyle}
+                placeholder=""
+                maxLength={1}
+                value={otpInput[1]}
+                keyboardType="number-pad"
+                returnKeyType="done"
+                onChangeText={(text) => handleOtpInputChange(text, 1)}
+              />
+              <TextInput
+                ref={inputRefs[2]}
+                style={styles.inputStyle}
+                placeholder=""
+                maxLength={1}
+                value={otpInput[2]}
+                keyboardType="number-pad"
+                returnKeyType="done"
+                onChangeText={(text) => handleOtpInputChange(text, 2)}
+              />
+              <TextInput
+                ref={inputRefs[3]}
+                style={styles.inputStyle}
+                placeholder=""
+                maxLength={1}
+                value={otpInput[3]}
+                keyboardType="number-pad"
+                returnKeyType="done"
+                onChangeText={(text) => handleOtpInputChange(text, 3)}
+              />
+            </View>
+          </View>
+          <View style={{ width: "90%", alignItems: "center" }}>
+            {otpSentStatus === "pending" ? (
+              <Pressable style={styles.otpSendingBtnStyle}>
+                <Text style={styles.signupBtnText}>Sending OTP </Text>
+                <ActivityIndicator animating={isLoading} />
+              </Pressable>
+            ) : (
+              <TouchableOpacity
+                style={styles.signupBtnStyle}
+                onPress={handleVerifyOtp}
+              >
+                <Text style={styles.signupBtnText}>Verify</Text>
+              </TouchableOpacity>
+            )}
+            <Toast
+              ref={SuccessToastRef}
+              message={"Verified, redirecting to Signin page"}
+            />
+            <Toast ref={ErrorToastRef} message={error} />
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </CustomStatusLayout>
   );
 };
@@ -230,25 +225,25 @@ const styles = StyleSheet.create({
     // backgroundColor: "red",
   },
   inputStyle: {
-    color: "#2054b5",
-    backgroundColor: "#e6ecf7",
+    color: Colors.primaryDark,
+    backgroundColor: Colors.primaryLight,
     textAlign: "center",
     padding: 8,
     width: 50,
     height: 50,
     borderRadius: 30,
     borderWidth: 1,
-    borderColor: "#0741ad",
+    borderColor: Colors.primaryDark,
   },
   signupBtnStyle: {
-    backgroundColor: "#0741ad",
+    backgroundColor: Colors.primaryColor,
     padding: 12,
     width: "90%",
     borderRadius: 12,
     alignItems: "center",
   },
   otpSendingBtnStyle: {
-    backgroundColor: "#0741ad",
+    backgroundColor: Colors.primaryColor,
     padding: 12,
     width: "90%",
     borderRadius: 12,
@@ -258,20 +253,19 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   signupBtnText: {
-    color: "#fff",
+    color: Colors.black,
     fontWeight: "bold",
   },
   loginBtnStyle: {
-    // backgroundColor: "#fff",
     padding: 12,
     width: "90%",
-    borderColor: "#0741ad",
+    borderColor: Colors.primaryDark,
     borderWidth: 2,
     borderRadius: 12,
     alignItems: "center",
   },
   loginBtnText: {
-    color: "#0741ad",
+    color: Colors.primaryDark,
     fontWeight: "bold",
   },
 });
